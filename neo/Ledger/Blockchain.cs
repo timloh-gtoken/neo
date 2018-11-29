@@ -358,6 +358,12 @@ namespace Neo.Ledger
                 }
                 SaveHeaderHashList(snapshot);
                 snapshot.Commit();
+                // If there was no header for the next block and it was added to the unverified block cache, it will
+                // potentially never be tried again without this (this is probably why nodes get stuck)
+                // specifically knownHashes in TaskManager will already have the hash so won't attempt to get the data
+                // again.
+                if (block_cache_unverified.TryGetValue(Height + 1, out Block unverifiedBlock))
+                    Self.Tell(unverifiedBlock, ActorRefs.NoSender);
             }
             UpdateCurrentSnapshot();
             system.TaskManager.Tell(new TaskManager.HeaderTaskCompleted(), Sender);
