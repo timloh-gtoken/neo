@@ -358,8 +358,14 @@ namespace Neo.Ledger
         {
             using (Snapshot snapshot = GetSnapshot())
             {
-                foreach (Header header in headers)
+                // Take all but the last header in case we received headers form a node that got stuck due
+                // to having accepted an orphaned block where the consensus genreated a block with the same
+                // transactions as the block that was built upon, but with a different nonce
+                // TODO: This is a hack that shouldn't be needed once consensus improvements are in for
+                //       long enough that nodes with the invalid duplicate blocks have left the network.
+                for (int i = 0; i < headers.Length - 1; i++)
                 {
+                    Header header = headers[i];
                     if (header.Index - 1 >= header_index.Count) break;
                     if (header.Index < header_index.Count) continue;
                     if (!header.Verify(snapshot)) break;
