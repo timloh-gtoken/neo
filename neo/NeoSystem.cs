@@ -7,6 +7,7 @@ using Neo.Persistence;
 using Neo.Plugins;
 using Neo.Wallets;
 using System;
+using System.Linq;
 using System.Net;
 
 namespace Neo
@@ -30,9 +31,9 @@ namespace Neo
         private ChannelsConfig start_message = null;
         private bool suspend = false;
 
-        public NeoSystem(Store store)
+        public NeoSystem(Store store = null)
         {
-            this.store = store;
+            this.store = store ?? Plugin.Storages.First().GetStore();
             Plugin.LoadPlugins(this);
             this.Blockchain = ActorSystem.ActorOf(Ledger.Blockchain.Props(this, store));
             this.LocalNode = ActorSystem.ActorOf(Network.P2P.LocalNode.Props(this));
