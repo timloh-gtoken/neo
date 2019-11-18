@@ -50,6 +50,7 @@ namespace Neo
             // Dispose will call ActorSystem.Terminate()
             ActorSystem.Dispose();
             ActorSystem.WhenTerminated.Wait();
+            store.Dispose();
         }
 
         public void EnsureStoped(IActorRef actor)

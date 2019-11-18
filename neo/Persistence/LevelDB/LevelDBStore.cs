@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace Neo.Persistence.LevelDB
 {
-    public class LevelDBStore : Store, IDisposable
+    public class LevelDBStore : Store
     {
         private readonly DB db;
 
@@ -29,7 +29,7 @@ namespace Neo.Persistence.LevelDB
             db.Write(WriteOptions.Default, batch);
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
             db.Dispose();
         }

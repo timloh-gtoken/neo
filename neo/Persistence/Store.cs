@@ -1,10 +1,11 @@
 using Neo.IO.Caching;
 using Neo.IO.Wrappers;
 using Neo.Ledger;
+using System;
 
 namespace Neo.Persistence
 {
-    public abstract class Store : IPersistence
+    public abstract class Store : IDisposable, IPersistence
     {
         DataCache<UInt256, TrimmedBlock> IPersistence.Blocks => GetBlocks();
         DataCache<UInt256, TransactionState> IPersistence.Transactions => GetTransactions();
@@ -13,6 +14,8 @@ namespace Neo.Persistence
         DataCache<UInt32Wrapper, HeaderHashList> IPersistence.HeaderHashList => GetHeaderHashList();
         MetaDataCache<HashIndexState> IPersistence.BlockHashIndex => GetBlockHashIndex();
         MetaDataCache<HashIndexState> IPersistence.HeaderHashIndex => GetHeaderHashIndex();
+
+        public abstract void Dispose();
 
         public abstract byte[] Get(byte[] key);
         public abstract DataCache<UInt256, TrimmedBlock> GetBlocks();
