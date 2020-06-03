@@ -55,6 +55,17 @@ namespace Neo.SmartContract
             return testMode || GasConsumed <= gas_amount;
         }
 
+        protected override void ContextUnloaded(ExecutionContext context)
+        {
+            base.ContextUnloaded(context);
+            if (CurrentContext is null) return;
+            if (context.EvaluationStack == CurrentContext.EvaluationStack) return;
+            if (context.EvaluationStack.Count > 1) throw new InvalidOperationException();
+            ContractParameterType returnType = context.GetState<ExecutionContextState>().ReturnType;
+            if (returnType == ContractParameterType.Void ^ context.EvaluationStack.Count == 0)
+                throw new InvalidOperationException();
+        }
+
         protected override void LoadContext(ExecutionContext context)
         {
             // Set default execution context state
@@ -64,9 +75,9 @@ namespace Neo.SmartContract
             base.LoadContext(context);
         }
 
-        public ExecutionContext LoadScript(Script script, CallFlags callFlags, int rvcount = -1)
+        public ExecutionContext LoadScript(Script script, CallFlags callFlags)
         {
-            ExecutionContext context = LoadScript(script, rvcount);
+            ExecutionContext context = LoadScript(script);
             context.GetState<ExecutionContextState>().CallFlags = callFlags;
             return context;
         }
